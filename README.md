@@ -1,4 +1,4 @@
 # Rename-By-Tags-GUI
 Simple program which will get tracknumber and title from metadata and rename chosen files based on them. Only .flac and .mp3 files for now.
 
-![Alt text](https://www.dropbox.com/s/1vk79xf6ywwsiz5/Screenshot%202019-04-16%2023.18.22.png?dl=0 "Screenshot of program")
+![Alt text](https://uc9f9787e9edf4247d5d8666d81c.previews.dropboxusercontent.com/p/thumb/AAbHdU_byhChHDVXRvXmbsnb6dgZDQMSbPpHFdVzzVd1fWrYZSXBYSv2KMrRs2o8hSbKtTuo0Yuz3IIWHKloJMfn4ihjyb0sqpreSZa9xz0QbH1xo3kh1-aDypiFTRu9jHrbTQwwhp0j1qiH7HbUKg03EIHD8bQZolr5yzE57jFFyH7tCouLO6I-WAlpcsmblQmW2SfuJOCrT7qBpZuqFVFUF73AghWw97zepjel3-vy6lOlpBxjOUG3lXDMJFeEDl8TMljkTZ06ffmKbD32Rl33a6ClxX_yguOg23Z0gaKXdaiDO_EOPD4DJCwe6sNyF3A04lRFW3_ylkRSnyr2j1BDtp8okfyYy5d3q3h6AeOmoCOsNl4XeNy_uETq46HD7V0/p.png?size_mode=5 "Screenshot of program")
