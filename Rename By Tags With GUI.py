@@ -186,7 +186,7 @@ def insText(text):
 
 
 def toggle_state(*_):
-    if folderPath.get():
+    if os.path.isdir(folderPath.get()):
         btnRename.config(state="normal")
     else:
         btnRename.config(state="disabled")
@@ -195,6 +195,7 @@ def toggle_state(*_):
 def typeWarningsAndCredits():
     textbox.configure(state="normal")
     # INSERTS HERE!
+    # textbox.insert(END, " \n")
     textbox.configure(state="disabled")
 
 
@@ -221,6 +222,9 @@ btnCsv.pack(side=LEFT, padx=(2, 1))
 # textbox
 textbox = Text(bottomFrame, state="disabled")
 textbox.pack(side=LEFT, fill=BOTH, expand=YES)
+
+# Warnings
+typeWarningsAndCredits()
 
 # mainloop
 root.mainloop()
