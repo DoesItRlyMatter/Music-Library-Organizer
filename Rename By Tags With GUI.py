@@ -1,6 +1,6 @@
 # Created by Anton Kerke
-# Last updated 13/4/19
-# Version 1.0
+# Last updated 21/09/19
+# Version 1.1
 
 from tkinter import *
 from tkinter import ttk
@@ -36,6 +36,20 @@ def getFolderPath():
     folderPath.set(folder_selected)
 
 
+def cleanTitle():
+    current_dir = pathlib.Path(folderPath.get())
+    for path in sorted(current_dir.rglob("*")):
+        try:
+            audio = FLAC(path)
+            title = audio["title"]
+            title = title_cleanup(title)
+            audio["title"] = title
+            audio.save()
+            insText(path.name[:60].ljust(60) + " - Title Cleaned")
+        except:
+            insText(path.name[:60].ljust(60) + " - Failed")
+
+
 def renameFiles():
     # variables.
     supported_filetypes = [".flac", ".mp3"]
@@ -60,10 +74,9 @@ def renameFiles():
                 except:
                     # print(" " + colored(path.name, "red", attrs=["bold"]) + " Error: File could not be renamed, check title & tracknumber.")
                     # textbox.insert(INSERT, path.name[:50].ljust(50) + " - Failed \n")
-                    insText(path.name[:50].ljust(50) + " - Failed")
+                    insText(path.name[:60].ljust(60) + " - Failed")
                     old_titles.append(path.name)
-                    new_titles.append(
-                        "Error: File could not be renamed, check title & tracknumber.")
+                    new_titles.append("Error: File could not be renamed, check title & tracknumber.")
                     flag += 1
                     err_count += 1
             elif og_file_info[0] == "ID3":
@@ -72,7 +85,7 @@ def renameFiles():
                 except:
                     # print(" " + colored(path.name, "red", attrs=["bold"]) + " Error: File could not be renamed, check title & tracknumber.")
                     # textbox.insert(INSERT, path.name[:50].ljust(50) + " - Failed \n")
-                    insText(path.name[:50].ljust(50) + " - Failed")
+                    insText(path.name[:60].ljust(60) + " - Failed")
                     old_titles.append(path.name)
                     new_titles.append("Error: File could not be renamed, check title & tracknumber.")
                     flag += 1
@@ -88,7 +101,7 @@ def renameFiles():
                 # print old & new name.
                 # print(" " + path.name[:50].ljust(50) + colored("   -->   ", "green") + filename_str[:50].ljust(50))
                 # PRINT CHANGES HERE!!
-                insText(filename_str[:70].ljust(70) + " - Done")
+                insText(filename_str[:60].ljust(60) + " - File Renamed")
                 # add old/new names to arrays
                 old_titles.append(path.name)
                 new_titles.append(filename_str)
@@ -157,6 +170,22 @@ def cleanup(f_fn):
         return f_fn
 
 
+def title_cleanup(f_title):
+    # trans table stuff, couldnt be arsed to read documentation properly but it works.
+    f_title = "".join(f_title)
+    inp = ""
+    out = ""
+    remove = r'"\/:?*<>|'
+    # remove forbidden characters
+    table = f_title.maketrans(inp, out, remove)
+    f_title = f_title.translate(table)
+    # correct numbering
+    f_title = f_title.lstrip("0")
+    # capitalize first char in each word.
+    f_title = string.capwords(f_title)
+    return f_title
+
+
 def makeCsv():
     # date variables
     try:
@@ -188,8 +217,10 @@ def insText(text):
 def toggle_state(*_):
     if os.path.isdir(folderPath.get()):
         btnRename.config(state="normal")
+        btnClean.config(state="normal")
     else:
         btnRename.config(state="disabled")
+        btnClean.config(state="disabled")
 
 
 def typeWarningsAndCredits():
@@ -212,11 +243,15 @@ btnBrowse.pack(side=LEFT, padx=(2, 0))
 btnRename = ttk.Button(topFrame, text="Rename", command=renameFiles, state="disabled")
 btnRename.pack(side=LEFT, padx=(2, 0))
 
+# Run title cleanup addon.
+btnClean = ttk.Button(topFrame, text="Clean Title", command=cleanTitle, state="disabled")
+btnClean.pack(side=LEFT, padx=(2, 0))
+
 # check if anything written in entry box.
 folderPath.trace_add("write", toggle_state)
 
 # csv button, Greyed out until program has finished running.
-btnCsv = ttk.Button(topFrame, text="Save Csv", command=makeCsv, state=DISABLED)
+btnCsv = ttk.Button(topFrame, text="Save CSV", command=makeCsv, state=DISABLED)
 btnCsv.pack(side=LEFT, padx=(2, 1))
 
 # textbox
