@@ -37,6 +37,11 @@ def placeholder():
         print(track.album[0])
 
 
+# Create the filename
+def create_filename():
+    # Create string based on checkbox values.
+
+
 def getFolderPath():
     folder_selected = filedialog.askdirectory()
     folderPath.set(folder_selected)
