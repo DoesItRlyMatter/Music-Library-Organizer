@@ -7,6 +7,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 import string
+from mutagen.flac import FLAC
+from mutagen.mp3 import EasyMP3 as MP3
 
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
@@ -23,8 +25,11 @@ class Track:
         self.artist = artist
 
 
+# Test function
 def placeholder():
-    print("Hello World!")
+    # Iterate through all the tracks (objects)
+    for track in trackList:
+        print(track.title)
 
 
 def getFolderPath():
@@ -33,9 +38,6 @@ def getFolderPath():
 
 
 def runProgram():
-    # Counting vars
-    flac = 0
-    mp3 = 0
     # Get current directory
     current_dir = pathlib.Path(folderPath.get())
 
@@ -44,16 +46,25 @@ def runProgram():
         # print(pathlib.Path(path).suffix)
         ext = pathlib.Path(path).suffix
         # Check if ext is .flac [0] or .mp3 [1]
+        # If ext is .flac
         if ext == supportedFiletypes[0]:
-
-            # count flacs
-            flac += 1
+            # get files metadata
+            metadata = FLAC(path)
+            # Append objects with metadata to tracklist.
+            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist']))
+            # Just print something to visually show somethings happening. can be removed.
+            print('Item added!')
+        # If ext is .mp3
         elif ext == supportedFiletypes[1]:
-            # count mp3s
-            mp3 += 1
+            print('MP3')
 
-    print(flac)
-    print(mp3)
+    # Testing states of checkboxes, can be removed.
+    if checkVarNUM.get() == 1:
+        print('NUMBER CHECKED!')
+    if checkVarART.get() == 1:
+        print('ARTIST CHECKED!')
+    if checkVarTIT.get() == 1:
+        print('TITLE CHECKED!')
 
 
 def toggle_state(*_):
@@ -88,29 +99,29 @@ btnBrowse = ttk.Button(topFrame, text="Browse", command=getFolderPath)
 btnBrowse.pack(side=LEFT, padx=(2, 0))
 
 # Include checkboxes
-checkVar1 = IntVar()
-checkVar2 = IntVar()
-checkVar3 = IntVar()
+checkVarNUM = IntVar()
+checkVarART = IntVar()
+checkVarTIT = IntVar()
 
 incLabel = Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox1 = Checkbutton(sideFrame, text="Track Num", variable=checkVar1)
+checkBox1 = Checkbutton(sideFrame, text="Track Num", variable=checkVarNUM)
 checkBox1.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVar2)
+checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVarART)
 checkBox2.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox3 = Checkbutton(sideFrame, text="Title", variable=checkVar3)
+checkBox3 = Checkbutton(sideFrame, text="Title", variable=checkVarTIT)
 checkBox3.pack(anchor=W, side=TOP, padx=(0, 0))
 
 # Language checkboxes
 langLabel = Label(sideFrame, text="Language", font="Arial 10 bold")
 langLabel.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkVar4 = IntVar()
-checkBox4 = Checkbutton(sideFrame, text="Romanji", variable=checkVar4)
-checkBox4.pack(anchor=W, side=TOP, padx=(0, 0))
+checkVarLANG = IntVar()
+checkBoxLANG = Checkbutton(sideFrame, text="Romanji", variable=checkVarLANG, state=DISABLED)
+checkBoxLANG.pack(anchor=W, side=TOP, padx=(0, 0))
 
 # Extra function checkboxes
 extraLabel = Label(sideFrame, text="Extra", font="Arial 10 bold")
@@ -123,6 +134,10 @@ checkBox5.pack(anchor=W, side=TOP, padx=(0, 0))
 # Click and run program.
 btnRun = ttk.Button(topFrame, text="Run", command=runProgram, state="disabled")
 btnRun.pack(side=LEFT, padx=(2, 1))
+
+# Temporary buttons for testing
+btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
+btnTest.pack(side=LEFT, padx=(2, 1))
 
 # check if anything written in entry box.
 folderPath.trace_add("write", toggle_state)
