@@ -17,19 +17,24 @@ trackList = []
 
 class Track:
 
-    def __init__(self, path, ext, title, track_num, artist):
+    def __init__(self, path, ext, title, track_num, artist, album):
         self.path = path
         self.ext = ext
         self.title = title
         self.track_num = track_num
         self.artist = artist
+        self.album = album
 
 
 # Test function
 def placeholder():
     # Iterate through all the tracks (objects)
     for track in trackList:
-        print(track.title)
+        # 0 to only get content.
+        print(track.track_num[0])
+        print(track.artist[0])
+        print(track.title[0])
+        print(track.album[0])
 
 
 def getFolderPath():
@@ -51,12 +56,15 @@ def runProgram():
             # get files metadata
             metadata = FLAC(path)
             # Append objects with metadata to tracklist.
-            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist']))
+            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
             # Just print something to visually show somethings happening. can be removed.
-            print('Item added!')
+            print('FLAC item added!')
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
-            print('MP3')
+            # same as flac section, check comments there.
+            metadata = MP3(path)
+            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
+            print('MP3 item added!')
 
     # Testing states of checkboxes, can be removed.
     if checkVarNUM.get() == 1:
