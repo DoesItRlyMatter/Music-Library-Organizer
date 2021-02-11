@@ -52,8 +52,7 @@ def getFolderPath():
 def runProgram():
     # Get current directory
     current_dir = pathlib.Path(folderPath.get())
-
-    # Run the program
+    # Run the program. Create Track obj for every .flac/.mp3 file.
     for path in sorted(current_dir.rglob("*")):
         # print(pathlib.Path(path).suffix)
         ext = pathlib.Path(path).suffix
@@ -73,15 +72,8 @@ def runProgram():
             trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
             print('MP3 item added!')
 
-    # Testing states of checkboxes, can be removed.
-    if checkVarNUM.get() is True:
-        print('NUMBER CHECKED!')
-    if checkVarART.get() is True:
-        print('ARTIST CHECKED!')
-    if checkVarTIT.get() is True:
-        print('TITLE CHECKED!')
 
-
+# Toggle run button state. Check if folderpath is valid folder path.
 def toggle_state(*_):
     # run state
     if os.path.isdir(folderPath.get()):
