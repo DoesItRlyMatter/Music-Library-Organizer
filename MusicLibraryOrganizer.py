@@ -13,6 +13,7 @@ from mutagen.mp3 import EasyMP3 as MP3
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
 trackList = []
+checkBoxStates = []
 
 
 class Track:
@@ -40,6 +41,7 @@ def placeholder():
 # Create the filename
 def create_filename():
     # Create string based on checkbox values.
+    print()
 
 
 def getFolderPath():
@@ -72,26 +74,36 @@ def runProgram():
             print('MP3 item added!')
 
     # Testing states of checkboxes, can be removed.
-    if checkVarNUM.get() == 1:
+    if checkVarNUM.get() is True:
         print('NUMBER CHECKED!')
-    if checkVarART.get() == 1:
+    if checkVarART.get() is True:
         print('ARTIST CHECKED!')
-    if checkVarTIT.get() == 1:
+    if checkVarTIT.get() is True:
         print('TITLE CHECKED!')
 
 
 def toggle_state(*_):
+    # run state
     if os.path.isdir(folderPath.get()):
         btnRun.config(state="normal")
     else:
         btnRun.config(state="disabled")
 
 
+def toggle_format(chkStates):
+    # Check if any of the checkboxes are checked. If one or more checked disable renameformat entry.
+    if any(i.get() is True for i in chkStates):
+        renameFormat.config(state="disabled")
+    else:
+        renameFormat.config(state="normal")
+
+
 # Create & Configure root
 root = Tk()
 root.geometry("650x400")
-# window title.
+# Window title and icon
 root.title("Music Library Organizer")
+root.iconbitmap(default="mlo_icon.ico")
 
 # Create & Configure frames
 sideFrame = Frame(root)
@@ -112,21 +124,29 @@ btnBrowse = ttk.Button(topFrame, text="Browse", command=getFolderPath)
 btnBrowse.pack(side=LEFT, padx=(2, 0))
 
 # Include checkboxes
-checkVarNUM = IntVar()
-checkVarART = IntVar()
-checkVarTIT = IntVar()
+checkVarNUM = BooleanVar()
+checkBoxStates.append(checkVarNUM)
+checkVarART = BooleanVar()
+checkBoxStates.append(checkVarART)
+checkVarALB = BooleanVar()
+checkBoxStates.append(checkVarALB)
+checkVarTIT = BooleanVar()
+checkBoxStates.append(checkVarTIT)
 
 incLabel = Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox1 = Checkbutton(sideFrame, text="Track Num", variable=checkVarNUM)
+checkBox1 = Checkbutton(sideFrame, text="Track Num", variable=checkVarNUM, command=lambda: toggle_format(checkBoxStates))
 checkBox1.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVarART)
+checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggle_format(checkBoxStates))
 checkBox2.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox3 = Checkbutton(sideFrame, text="Title", variable=checkVarTIT)
+checkBox3 = Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggle_format(checkBoxStates))
 checkBox3.pack(anchor=W, side=TOP, padx=(0, 0))
+
+checkBox4 = Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggle_format(checkBoxStates))
+checkBox4.pack(anchor=W, side=TOP, padx=(0, 0))
 
 # Language checkboxes
 langLabel = Label(sideFrame, text="Language", font="Arial 10 bold")
@@ -149,8 +169,13 @@ btnRun = ttk.Button(topFrame, text="Run", command=runProgram, state="disabled")
 btnRun.pack(side=LEFT, padx=(2, 1))
 
 # Temporary buttons for testing
-btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
-btnTest.pack(side=LEFT, padx=(2, 1))
+# btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
+# btnTest.pack(side=LEFT, padx=(2, 1))
+
+# Free naming format
+placeholderText = StringVar(root, value='{Tracknumber} - {Artist} - {Album} - {Title}')
+renameFormat = Entry(bottomFrame, textvariable=placeholderText)
+renameFormat.pack(side=TOP, fill=X, expand=NO, padx=(0, 0), pady=(0, 2))
 
 # check if anything written in entry box.
 folderPath.trace_add("write", toggle_state)
