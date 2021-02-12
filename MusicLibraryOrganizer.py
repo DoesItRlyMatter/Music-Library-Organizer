@@ -37,11 +37,31 @@ def placeholder():
         print(track.title[0])
         print(track.album[0])
 
+    print(placeholderText.get())
+    create_filename()
+
 
 # Create the filename
 def create_filename():
-    # Create string based on checkbox values.
-    print()
+    # Create string based on checkbox value or entry string.
+    # Check which method to use.
+    # if any checkbox checked, do this.
+    if any(i.get() is True for i in checkBoxStates):
+        # variable for storing string (title)
+        titleStr = ''
+        # interate thought checkboxes, add whats checked.
+        for c, j in enumerate(checkBoxStates):
+            if j.get() is True:
+                # Only do this on first iteration. NEEDS CHANGE!
+                if c == 0:
+                    titleStr += 'Loop'
+                # do this on the other iterations.
+                else:
+                    titleStr += ' - Loop'
+        print(titleStr)
+    # else if no checkbox checked, do this.
+    else:
+        print('NO CHECKBOX!')
 
 
 def getFolderPath():
@@ -128,7 +148,7 @@ checkBoxStates.append(checkVarTIT)
 incLabel = Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=W, side=TOP, padx=(0, 0))
 
-checkBox1 = Checkbutton(sideFrame, text="Track Num", variable=checkVarNUM, command=lambda: toggle_format(checkBoxStates))
+checkBox1 = Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggle_format(checkBoxStates))
 checkBox1.pack(anchor=W, side=TOP, padx=(0, 0))
 
 checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggle_format(checkBoxStates))
@@ -153,7 +173,7 @@ extraLabel = Label(sideFrame, text="Extra", font="Arial 10 bold")
 extraLabel.pack(anchor=W, side=TOP, padx=(0, 0))
 
 checkVar5 = IntVar()
-checkBox5 = Checkbutton(sideFrame, text="Cleanup Title", variable=checkVar5)
+checkBox5 = Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
 checkBox5.pack(anchor=W, side=TOP, padx=(0, 0))
 
 # Click and run program.
@@ -161,8 +181,8 @@ btnRun = ttk.Button(topFrame, text="Run", command=runProgram, state="disabled")
 btnRun.pack(side=LEFT, padx=(2, 1))
 
 # Temporary buttons for testing
-# btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
-# btnTest.pack(side=LEFT, padx=(2, 1))
+btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
+btnTest.pack(side=LEFT, padx=(2, 1))
 
 # Free naming format
 placeholderText = StringVar(root, value='{Tracknumber} - {Artist} - {Album} - {Title}')
