@@ -24,11 +24,11 @@ class chk:
 
 class Track:
 
-    def __init__(self, path, ext, title, track_num, artist, album):
+    def __init__(self, path, ext, title, tracknumber, artist, album):
         self.path = path
         self.ext = ext
         self.title = title
-        self.track_num = track_num
+        self.tracknumber = tracknumber
         self.artist = artist
         self.album = album
 
@@ -38,13 +38,18 @@ def placeholder():
     # Iterate through all the tracks (objects)
     for track in trackList:
         # 0 to only get content.
-        # print(track.track_num[0])
+        # print(track.tracknumber[0])
         # print(track.artist[0])
         # print(track.title[0])
         # print(track.album[0])
         createFilename(track)
 
     print(placeholderText.get())
+
+
+# do all title formatting here.
+def formatTitle():
+    print('Hello World!')
 
 
 # Create the filename
@@ -62,13 +67,13 @@ def createFilename(track):
                 # Only do this on first iteration.
                 if firstTrue is True:
                     # call addToString to add value of checked checkbox.
-                    titleStr = addToString(j.id, '')
+                    titleStr = addToString(j.id, '', track)
                     # Var false, we dont want this to run multiple times.
                     firstTrue = False
                 # do this on the other iterations.
                 else:
                     titleStr += ' - '
-                    titleStr = addToString(j.id, titleStr)
+                    titleStr = addToString(j.id, titleStr, track)
         print(titleStr)
         titleStr = ''
         # Make var true again else it wont work correctly next time function is called.
@@ -80,16 +85,16 @@ def createFilename(track):
 
 
 # Add checked checkbox value to string.
-def addToString(id, str):
+def addToString(id, str, trk):
     # if which ever value id matches to.
     if id == 'chkTracknumber':
-        str = '00'
+        str = trk.tracknumber[0]
     if id == 'chkArtist':
-        str += 'Artist'
+        str += trk.artist[0]
     if id == 'chkAlbum':
-        str += 'Album'
+        str += trk.album[0]
     if id == 'chkTitle':
-        str += 'Title'
+        str += trk.title[0]
     return str
 
 
@@ -110,7 +115,7 @@ def runProgram():
         if ext == supportedFiletypes[0]:
             # get files metadata
             metadata = FLAC(path)
-            # Append objects with metadata to tracklist.
+            # Append objects with metadata to tracklist. metadata['xx'] probably wrong. Make it only string.
             trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
@@ -139,7 +144,8 @@ def toggleFormat():
 
 # Create & Configure root
 root = tk.Tk()
-root.geometry("650x400")
+# root.geometry("650x400")
+root.geometry('830x520')
 # Window title and icon
 root.title("Music Library Organizer")
 root.iconbitmap(default="mlo_icon.ico")
@@ -222,7 +228,6 @@ folderPath.trace_add("write", toggleState)
 # textbox
 textbox = tk.Text(bottomFrame, state="disabled")
 textbox.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES, padx=(0, 0))
-
 
 # Mainloop
 root.mainloop()
