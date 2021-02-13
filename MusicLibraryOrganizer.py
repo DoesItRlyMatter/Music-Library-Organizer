@@ -35,13 +35,13 @@ def placeholder():
         # print(track.artist[0])
         # print(track.title[0])
         # print(track.album[0])
-        create_filename(track)
+        createFilename(track)
 
     print(placeholderText.get())
 
 
 # Create the filename
-def create_filename(track):
+def createFilename(track):
     # Create string based on checkbox value or entry string.
     # Check which method to use.
     # if any checkbox checked, do this.
@@ -104,7 +104,7 @@ def runProgram():
 
 
 # Toggle run button state. Check if folderpath is valid folder path.
-def toggle_state(*_):
+def toggleState(*_):
     # run state
     if os.path.isdir(folderPath.get()):
         btnRun.config(state="normal")
@@ -112,7 +112,7 @@ def toggle_state(*_):
         btnRun.config(state="disabled")
 
 
-def toggle_format():
+def toggleFormat():
     # Check if any of the checkboxes are checked. If one or more checked disable renameformat entry.
     if any(i.get() is True for i in checkBoxStates):
         renameFormat.config(state="disabled")
@@ -158,16 +158,16 @@ checkBoxStates.append(checkVarTIT)
 incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggle_format())
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggleFormat())
 checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggle_format())
+checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggleFormat())
 checkBox2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggle_format())
+checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggleFormat())
 checkBox3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggle_format())
+checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggleFormat())
 checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
@@ -200,7 +200,7 @@ renameFormat = tk.Entry(bottomFrame, textvariable=placeholderText)
 renameFormat.pack(side=tk.TOP, fill=tk.X, expand=tk.NO, padx=(0, 0), pady=(0, 2))
 
 # check if anything written in entry box.
-folderPath.trace_add("write", toggle_state)
+folderPath.trace_add("write", toggleState)
 
 # textbox
 textbox = tk.Text(bottomFrame, state="disabled")
