@@ -8,4 +8,4 @@ Program for renaming .flac and .mp3 files. Gets track number and title from file
 
 MusicLibraryOrganizer
 
-Improved verions of Rename-By-Tags-GUI.
+Improved version of Rename-By-Tags-GUI.
