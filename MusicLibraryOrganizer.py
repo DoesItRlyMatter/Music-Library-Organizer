@@ -3,10 +3,9 @@
 # Imports
 import pathlib
 import os
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-import string
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3 as MP3
 
@@ -113,99 +112,99 @@ def toggle_state(*_):
         btnRun.config(state="disabled")
 
 
-def toggle_format(chkStates):
+def toggle_format():
     # Check if any of the checkboxes are checked. If one or more checked disable renameformat entry.
-    if any(i.get() is True for i in chkStates):
+    if any(i.get() is True for i in checkBoxStates):
         renameFormat.config(state="disabled")
     else:
         renameFormat.config(state="normal")
 
 
 # Create & Configure root
-root = Tk()
+root = tk.Tk()
 root.geometry("650x400")
 # Window title and icon
 root.title("Music Library Organizer")
 root.iconbitmap(default="mlo_icon.ico")
 
 # Create & Configure frames
-sideFrame = Frame(root)
-sideFrame.pack(side=LEFT, fill=BOTH)
+sideFrame = tk.Frame(root)
+sideFrame.pack(side=tk.LEFT, fill=tk.BOTH)
 
-topFrame = Frame(root)
-topFrame.pack(side=TOP, fill=X, padx=(4, 2), pady=(2, 2))
+topFrame = tk.Frame(root)
+topFrame.pack(side=tk.TOP, fill=tk.X, padx=(4, 2), pady=(2, 2))
 #
-bottomFrame = Frame(root)
-bottomFrame.pack(side=TOP, fill=BOTH, expand=YES, padx=(4, 4), pady=(0, 4))
+bottomFrame = tk.Frame(root)
+bottomFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES, padx=(4, 4), pady=(0, 4))
 
-folderPath = StringVar()
-txtField = Entry(topFrame, textvariable=folderPath)
-txtField.pack(side=LEFT, fill=X, expand=YES, padx=(0, 0), pady=(0, 0))
+folderPath = tk.StringVar()
+txtField = tk.Entry(topFrame, textvariable=folderPath)
+txtField.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=(0, 0), pady=(0, 0))
 
 # Browse button.
 btnBrowse = ttk.Button(topFrame, text="Browse", command=getFolderPath)
-btnBrowse.pack(side=LEFT, padx=(2, 0))
+btnBrowse.pack(side=tk.LEFT, padx=(2, 0))
 
 # Include checkboxes
-checkVarNUM = BooleanVar()
+checkVarNUM = tk.BooleanVar()
 checkBoxStates.append(checkVarNUM)
-checkVarART = BooleanVar()
+checkVarART = tk.BooleanVar()
 checkBoxStates.append(checkVarART)
-checkVarALB = BooleanVar()
+checkVarALB = tk.BooleanVar()
 checkBoxStates.append(checkVarALB)
-checkVarTIT = BooleanVar()
+checkVarTIT = tk.BooleanVar()
 checkBoxStates.append(checkVarTIT)
 
-incLabel = Label(sideFrame, text="Include", font="Arial 10 bold")
-incLabel.pack(anchor=W, side=TOP, padx=(0, 0))
+incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
+incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggle_format(checkBoxStates))
-checkBox1.pack(anchor=W, side=TOP, padx=(0, 0))
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggle_format())
+checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox2 = Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggle_format(checkBoxStates))
-checkBox2.pack(anchor=W, side=TOP, padx=(0, 0))
+checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggle_format())
+checkBox2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox3 = Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggle_format(checkBoxStates))
-checkBox3.pack(anchor=W, side=TOP, padx=(0, 0))
+checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggle_format())
+checkBox3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox4 = Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggle_format(checkBoxStates))
-checkBox4.pack(anchor=W, side=TOP, padx=(0, 0))
+checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggle_format())
+checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
-langLabel = Label(sideFrame, text="Language", font="Arial 10 bold")
-langLabel.pack(anchor=W, side=TOP, padx=(0, 0))
+langLabel = tk.Label(sideFrame, text="Language", font="Arial 10 bold")
+langLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkVarLANG = IntVar()
-checkBoxLANG = Checkbutton(sideFrame, text="Romanji", variable=checkVarLANG, state=DISABLED)
-checkBoxLANG.pack(anchor=W, side=TOP, padx=(0, 0))
+checkVarLANG = tk.IntVar()
+checkBoxLANG = tk.Checkbutton(sideFrame, text="Romanji", variable=checkVarLANG, state=tk.DISABLED)
+checkBoxLANG.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Extra function checkboxes
-extraLabel = Label(sideFrame, text="Extra", font="Arial 10 bold")
-extraLabel.pack(anchor=W, side=TOP, padx=(0, 0))
+extraLabel = tk.Label(sideFrame, text="Extra", font="Arial 10 bold")
+extraLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkVar5 = IntVar()
-checkBox5 = Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
-checkBox5.pack(anchor=W, side=TOP, padx=(0, 0))
+checkVar5 = tk.IntVar()
+checkBox5 = tk.Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
+checkBox5.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Click and run program.
 btnRun = ttk.Button(topFrame, text="Run", command=runProgram, state="disabled")
-btnRun.pack(side=LEFT, padx=(2, 1))
+btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
 # Temporary buttons for testing
 btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
-btnTest.pack(side=LEFT, padx=(2, 1))
+btnTest.pack(side=tk.LEFT, padx=(2, 1))
 
 # Free naming format
-placeholderText = StringVar(root, value='{Tracknumber} - {Artist} - {Album} - {Title}')
-renameFormat = Entry(bottomFrame, textvariable=placeholderText)
-renameFormat.pack(side=TOP, fill=X, expand=NO, padx=(0, 0), pady=(0, 2))
+placeholderText = tk.StringVar(root, value='{Tracknumber} - {Artist} - {Album} - {Title}')
+renameFormat = tk.Entry(bottomFrame, textvariable=placeholderText)
+renameFormat.pack(side=tk.TOP, fill=tk.X, expand=tk.NO, padx=(0, 0), pady=(0, 2))
 
 # check if anything written in entry box.
 folderPath.trace_add("write", toggle_state)
 
 # textbox
-textbox = Text(bottomFrame, state="disabled")
-textbox.pack(side=TOP, fill=BOTH, expand=YES, padx=(0, 0))
+textbox = tk.Text(bottomFrame, state="disabled")
+textbox.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES, padx=(0, 0))
 
 
 # Mainloop
