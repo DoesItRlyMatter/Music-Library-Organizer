@@ -32,17 +32,17 @@ def placeholder():
     # Iterate through all the tracks (objects)
     for track in trackList:
         # 0 to only get content.
-        print(track.track_num[0])
-        print(track.artist[0])
-        print(track.title[0])
-        print(track.album[0])
+        # print(track.track_num[0])
+        # print(track.artist[0])
+        # print(track.title[0])
+        # print(track.album[0])
+        create_filename(track)
 
     print(placeholderText.get())
-    create_filename()
 
 
 # Create the filename
-def create_filename():
+def create_filename(track):
     # Create string based on checkbox value or entry string.
     # Check which method to use.
     # if any checkbox checked, do this.
@@ -56,6 +56,11 @@ def create_filename():
             if j.get() is True:
                 # Only do this on first iteration.
                 if firstTrue is True:
+                    # OBS! BEHÖVER VETA VILKEN CHECKBOX SOM ÄR TRUE!
+                    # HUR?
+                    # - Class som sparar checkbox state och vilken det är frågan om?
+                    # - Annat sätt att få checkbox name?
+                    # - Kolla tkinter documentation.
                     titleStr += 'Loop'
                     # Var false, we dont want this to run multiple times.
                     firstTrue = False
