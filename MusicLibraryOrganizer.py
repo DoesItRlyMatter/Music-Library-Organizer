@@ -15,6 +15,13 @@ trackList = []
 checkBoxStates = []
 
 
+class chk:
+
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value
+
+
 class Track:
 
     def __init__(self, path, ext, title, track_num, artist, album):
@@ -45,33 +52,45 @@ def createFilename(track):
     # Create string based on checkbox value or entry string.
     # Check which method to use.
     # if any checkbox checked, do this.
-    if any(i.get() is True for i in checkBoxStates):
+    if any(i.value.get() is True for i in checkBoxStates):
         # variable for storing string (title)
-        titleStr = ''
         # interate thought checkboxes, add whats checked.
         # Var for checking if its loops first iteration.
         firstTrue = True
         for j in checkBoxStates:
-            if j.get() is True:
+            if j.value.get() is True:
                 # Only do this on first iteration.
                 if firstTrue is True:
-                    # OBS! BEHÖVER VETA VILKEN CHECKBOX SOM ÄR TRUE!
-                    # HUR?
-                    # - Class som sparar checkbox state och vilken det är frågan om?
-                    # - Annat sätt att få checkbox name?
-                    # - Kolla tkinter documentation.
-                    titleStr += 'Loop'
+                    # call addToString to add value of checked checkbox.
+                    titleStr = addToString(j.id, '')
                     # Var false, we dont want this to run multiple times.
                     firstTrue = False
                 # do this on the other iterations.
                 else:
-                    titleStr += ' - Loop'
+                    titleStr += ' - '
+                    titleStr = addToString(j.id, titleStr)
         print(titleStr)
+        titleStr = ''
         # Make var true again else it wont work correctly next time function is called.
         firstTrue = True
     # else if no checkbox checked, do this.
     else:
-        print('NO CHECKBOX!')
+        print('No checkboxes checked.')
+        print('Functionality not implemented.')
+
+
+# Add checked checkbox value to string.
+def addToString(id, str):
+    # if which ever value id matches to.
+    if id == 'chkTracknumber':
+        str = '00'
+    if id == 'chkArtist':
+        str += 'Artist'
+    if id == 'chkAlbum':
+        str += 'Album'
+    if id == 'chkTitle':
+        str += 'Title'
+    return str
 
 
 def getFolderPath():
@@ -93,14 +112,12 @@ def runProgram():
             metadata = FLAC(path)
             # Append objects with metadata to tracklist.
             trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
-            # Just print something to visually show somethings happening. can be removed.
-            print('FLAC item added!')
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
             # same as flac section, check comments there.
             metadata = MP3(path)
             trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
-            print('MP3 item added!')
+        print('Item of class track created and added to list.')
 
 
 # Toggle run button state. Check if folderpath is valid folder path.
@@ -114,7 +131,7 @@ def toggleState(*_):
 
 def toggleFormat():
     # Check if any of the checkboxes are checked. If one or more checked disable renameformat entry.
-    if any(i.get() is True for i in checkBoxStates):
+    if any(i.value.get() is True for i in checkBoxStates):
         renameFormat.config(state="disabled")
     else:
         renameFormat.config(state="normal")
@@ -146,28 +163,28 @@ btnBrowse = ttk.Button(topFrame, text="Browse", command=getFolderPath)
 btnBrowse.pack(side=tk.LEFT, padx=(2, 0))
 
 # Include checkboxes
-checkVarNUM = tk.BooleanVar()
-checkBoxStates.append(checkVarNUM)
-checkVarART = tk.BooleanVar()
-checkBoxStates.append(checkVarART)
-checkVarALB = tk.BooleanVar()
-checkBoxStates.append(checkVarALB)
-checkVarTIT = tk.BooleanVar()
-checkBoxStates.append(checkVarTIT)
+chkVarNum = tk.BooleanVar()
+checkBoxStates.append(chk('chkTracknumber', chkVarNum))
+chkVarArt = tk.BooleanVar()
+checkBoxStates.append(chk('chkArtist', chkVarArt))
+chkVarAlb = tk.BooleanVar()
+checkBoxStates.append(chk('chkAlbum', chkVarAlb))
+chkVarTit = tk.BooleanVar()
+checkBoxStates.append(chk('chkTitle', chkVarTit))
 
 incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=checkVarNUM, command=lambda: toggleFormat())
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: toggleFormat())
 checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=checkVarART, command=lambda: toggleFormat())
+checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: toggleFormat())
 checkBox2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=checkVarALB, command=lambda: toggleFormat())
+checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=chkVarAlb, command=lambda: toggleFormat())
 checkBox3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=checkVarTIT, command=lambda: toggleFormat())
+checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=chkVarTit, command=lambda: toggleFormat())
 checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
