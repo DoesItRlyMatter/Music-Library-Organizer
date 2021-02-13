@@ -171,7 +171,7 @@ checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=checkVarTIT, comman
 checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
-langLabel = tk.Label(sideFrame, text="Language", font="Arial 10 bold")
+langLabel = ttk.Label(sideFrame, text="Language", font="Arial 10 bold")
 langLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 checkVarLANG = tk.IntVar()
@@ -179,7 +179,7 @@ checkBoxLANG = tk.Checkbutton(sideFrame, text="Romanji", variable=checkVarLANG, 
 checkBoxLANG.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Extra function checkboxes
-extraLabel = tk.Label(sideFrame, text="Extra", font="Arial 10 bold")
+extraLabel = ttk.Label(sideFrame, text="Extra", font="Arial 10 bold")
 extraLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 checkVar5 = tk.IntVar()
