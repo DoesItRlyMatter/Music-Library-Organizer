@@ -50,15 +50,21 @@ def create_filename():
         # variable for storing string (title)
         titleStr = ''
         # interate thought checkboxes, add whats checked.
-        for c, j in enumerate(checkBoxStates):
+        # Var for checking if its loops first iteration.
+        firstTrue = True
+        for j in checkBoxStates:
             if j.get() is True:
-                # Only do this on first iteration. NEEDS CHANGE!
-                if c == 0:
+                # Only do this on first iteration.
+                if firstTrue is True:
                     titleStr += 'Loop'
+                    # Var false, we dont want this to run multiple times.
+                    firstTrue = False
                 # do this on the other iterations.
                 else:
                     titleStr += ' - Loop'
         print(titleStr)
+        # Make var true again else it wont work correctly next time function is called.
+        firstTrue = True
     # else if no checkbox checked, do this.
     else:
         print('NO CHECKBOX!')
