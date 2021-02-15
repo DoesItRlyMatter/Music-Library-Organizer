@@ -88,13 +88,13 @@ def createFilename(track):
 def addToString(id, str, trk):
     # if which ever value id matches to.
     if id == 'chkTracknumber':
-        str = trk.tracknumber[0]
+        str = trk.tracknumber
     if id == 'chkArtist':
-        str += trk.artist[0]
+        str += trk.artist
     if id == 'chkAlbum':
-        str += trk.album[0]
+        str += trk.album
     if id == 'chkTitle':
-        str += trk.title[0]
+        str += trk.title
     return str
 
 
@@ -116,12 +116,12 @@ def runProgram():
             # get files metadata
             metadata = FLAC(path)
             # Append objects with metadata to tracklist. metadata['xx'] probably wrong. Make it only string.
-            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
+            trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
             # same as flac section, check comments there.
             metadata = MP3(path)
-            trackList.append(Track(path, ext, metadata['title'], metadata['tracknumber'], metadata['artist'], metadata['album']))
+            trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
         print('Item of class track created and added to list.')
 
 
