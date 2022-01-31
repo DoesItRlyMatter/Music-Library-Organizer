@@ -10,6 +10,8 @@ from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3 as MP3
 
 # Global variables
+# Make separator user changeable
+separator = ' - '
 supportedFiletypes = [".flac", ".mp3"]
 trackList = []
 checkBoxStates = []
@@ -42,9 +44,9 @@ def placeholder():
         # print(track.artist[0])
         # print(track.title[0])
         # print(track.album[0])
-        createFilename(track)
+        createFilename(track, separator)
 
-    print(placeholderText.get())
+    print(entryFormat.get())
 
 
 # do all title formatting here.
@@ -53,7 +55,7 @@ def formatTitle():
 
 
 # Create the filename
-def createFilename(track):
+def createFilename(track, sepa):
     # Create string based on checkbox value or entry string.
     # Check which method to use.
     # if any checkbox checked, do this.
@@ -72,7 +74,7 @@ def createFilename(track):
                     firstTrue = False
                 # do this on the other iterations.
                 else:
-                    titleStr += ' - '
+                    titleStr += sepa
                     titleStr = addToString(j.id, titleStr, track)
         print(titleStr)
         titleStr = ''
@@ -142,6 +144,49 @@ def toggleFormat():
         renameFormat.config(state="normal")
 
 
+# Testing changing placeholder text.
+# Write logic for this!
+def dynamicFormatString(sepa):
+    # iterate through checkboxes, add whats checked.
+    # Var for checking if its loops first iteration.
+    # Check so it doesnt throw variable reference error!
+    if any(i.value.get() is True for i in checkBoxStates):
+        firstTrue = True
+        for i in checkBoxStates:
+            if i.value.get() is True:
+                # Only do this on first iteration.
+                if firstTrue is True:
+                    # call addToDynVar to add value of checked checkbox.
+                    dynVarStr = addToDynVar(i.id, '')
+                    # Var false, we dont want this to run multiple times.
+                    firstTrue = False
+                # do this on the other iterations.
+                else:
+                    dynVarStr += sepa
+                    dynVarStr = addToDynVar(i.id, dynVarStr)
+        # dynVarStr = ''
+        # Make var true again else it wont work correctly next time function is called.
+        firstTrue = True
+        # Set entry box text.
+        entryFormat.set(dynVarStr)
+    # If no checkboxes checked, placeholdertext defaults to empty. Might Change to something else later.
+    else:
+        entryFormat.set('')
+
+
+def addToDynVar(id, str):
+    # if which ever value id matches to.
+    if id == 'chkTracknumber':
+        str = '{tracknumber}'
+    if id == 'chkArtist':
+        str += '{artist}'
+    if id == 'chkAlbum':
+        str += '{album}'
+    if id == 'chkTitle':
+        str += '{title}'
+    return str
+
+
 # Create & Configure root
 root = tk.Tk()
 # root.geometry("650x400")
@@ -181,16 +226,16 @@ checkBoxStates.append(chk('chkTitle', chkVarTit))
 incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: toggleFormat())
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
 checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: toggleFormat())
+checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
 checkBox2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=chkVarAlb, command=lambda: toggleFormat())
+checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=chkVarAlb, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
 checkBox3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=chkVarTit, command=lambda: toggleFormat())
+checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=chkVarTit, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
 checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
@@ -218,8 +263,8 @@ btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
 btnTest.pack(side=tk.LEFT, padx=(2, 1))
 
 # Free naming format
-placeholderText = tk.StringVar(root, value='{Tracknumber} - {Artist} - {Album} - {Title}')
-renameFormat = tk.Entry(bottomFrame, textvariable=placeholderText)
+entryFormat = tk.StringVar(root, value='{tracknumber} - {artist} - {album} - {title}')
+renameFormat = tk.Entry(bottomFrame, textvariable=entryFormat)
 renameFormat.pack(side=tk.TOP, fill=tk.X, expand=tk.NO, padx=(0, 0), pady=(0, 2))
 
 # check if anything written in entry box.
