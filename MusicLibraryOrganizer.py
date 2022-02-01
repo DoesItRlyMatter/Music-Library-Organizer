@@ -261,7 +261,8 @@ checkBoxStates.append(chk('chkTitle', chkVarTit))
 incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum,
+                           command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
 checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
