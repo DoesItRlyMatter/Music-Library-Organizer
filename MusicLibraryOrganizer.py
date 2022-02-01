@@ -9,6 +9,7 @@ from tkinter import filedialog
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3 as MP3
 import threading
+import time
 
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
@@ -116,10 +117,18 @@ def getFolderPath():
 
 # ADD TRY CATCH TO APPEND, IT SOMETIMES FAILES AND THROWS ERROR!
 def addFiles():
+    # Counters
+    folders, files, added, skipped, errors = 0, 0, 0, 0, 0
+    # Start time.
+    startTime = time.perf_counter()
+    # Set status text
+    statusText.set('Adding files...')
     # Get current directory
     current_dir = pathlib.Path(folderPath.get())
     # Run the program. Create Track obj for every .flac/.mp3 file.
     for path in sorted(current_dir.rglob("*")):
+        # Add to file counter.
+        files += 1
         # print(pathlib.Path(path).suffix)
         ext = pathlib.Path(path).suffix
         # Check if ext is .flac [0] or .mp3 [1]
@@ -130,8 +139,13 @@ def addFiles():
             # Append objects with metadata to tracklist. metadata['xx'] probably wrong. Make it only string.
             try:
                 trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
+                # add to added counter.
+                added += 1
                 programOutput(str(path) + '   --> Added')
             except KeyError:
+                # add to error and skipped counters
+                errors += 1
+                skipped += 1
                 programOutput(str(path) + '   --> ERROR: Failed to Add. Missing metadata?')
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
@@ -139,11 +153,29 @@ def addFiles():
             metadata = MP3(path)
             try:
                 trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
+                # add to added counter.
+                added += 1
                 programOutput(str(path) + '   --> Added')
             except KeyError:
+                # add to error and skipped counters.
+                errors += 1
+                skipped += 1
                 programOutput(str(path) + '   --> ERROR: Failed to Add. Missing metadata?')
         else:
-            programOutput(str(path) + '   --> Skipped')
+            # Check if path is a folder
+            if os.path.isdir(path) is True:
+                # add to folder counter, remove one from file counter.
+                folders += 1
+                files -= 1
+                programOutput(str(path))
+            else:
+                skipped += 1
+                programOutput(str(path) + '   --> Skipped')
+    # End time.
+    endTime = time.perf_counter()
+    # Update status text
+    # ADD STATISTICS HERE LATER (RUNTIME, FOLDERS, ADDED FILES, SKIPPED FILES)
+    statusText.set(f'Folders: {folders}   Files: {files}   Added: {added}   Skipped: {skipped}   Errors: {errors}   Time: {endTime - startTime:0.2f}s')
 
 
 # Insert text into program window.
@@ -228,6 +260,10 @@ root.title("Music Library Organizer")
 root.iconbitmap(default="mlo_icon.ico")
 
 # Create & Configure frames
+statusText = tk.StringVar()
+statusbar = tk.Label(root, textvariable=statusText, bd=1, relief=tk.SUNKEN, anchor=tk.W)
+statusbar.pack(side=tk.BOTTOM, fill=tk.X, padx=(4, 4), pady=(1, 4))
+
 sideFrame = tk.Frame(root)
 sideFrame.pack(side=tk.LEFT, fill=tk.BOTH)
 
@@ -291,7 +327,7 @@ checkBox5 = tk.Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
 checkBox5.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Click and run program.
-btnRun = ttk.Button(topFrame, text="Add", command=threading.Thread(target=addFiles).start, state="disabled")
+btnRun = ttk.Button(topFrame, text="Add", command=lambda: threading.Thread(target=addFiles).start(), state="disabled")
 btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
 # Temporary buttons for testing
