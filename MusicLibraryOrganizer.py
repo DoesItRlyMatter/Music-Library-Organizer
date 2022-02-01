@@ -34,80 +34,36 @@ class Track:
         self.artist = artist
         self.album = album
 
+    def formatMetadata(self):
+        # Return formatted metadata.
+        print('formatted metadata.')
+
+    # Return new filename based on metadata. RETURNS FILENAME AS STRING
+    def createNewFilename(self, separator, format):
+        newFilename = format
+        # Check if custom user format contains the replaceable strings
+        if '{tracknumber}' in format:
+            newFilename = newFilename.replace('{tracknumber}', self.tracknumber)
+        if '{artist}' in format:
+            newFilename = newFilename.replace('{artist}', self.artist)
+        if '{album}' in format:
+            newFilename = newFilename.replace('{album}', self.album)
+        if '{title}' in format:
+            newFilename = newFilename.replace('{title}', self.title)
+        return newFilename
+
 
 # Test function
 def renameFiles():
     # Iterate through all the tracks (objects)
     for track in trackList:
-        # 0 to only get content.
-        # print(track.tracknumber[0])
-        # print(track.artist[0])
-        # print(track.title[0])
-        # print(track.album[0])
-        createFilename(track, userSeparator.get(), entryFormat)
-
-    # print(entryFormat.get())
+        filename = track.createNewFilename(userSeparator.get(), entryFormat.get(), checkBoxStates)
+        print(filename)
 
 
 # do all title formatting here.
 def formatTitle():
     print('Hello World!')
-
-
-# Create the filename
-def createFilename(track, sepa, format):
-    # Create string based on checkbox value or entry string.
-    # Check which method to use.
-    # if any checkbox checked, do this.
-    if any(i.value.get() is True for i in checkBoxStates):
-        # variable for storing string (title)
-        # interate thought checkboxes, add whats checked.
-        # Var for checking if its loops first iteration.
-        firstTrue = True
-        for j in checkBoxStates:
-            if j.value.get() is True:
-                # Only do this on first iteration.
-                if firstTrue is True:
-                    # call addToString to add value of checked checkbox.
-                    titleStr = addToString(j.id, '', track)
-                    # Var false, we dont want this to run multiple times.
-                    firstTrue = False
-                # do this on the other iterations.
-                else:
-                    titleStr += sepa
-                    titleStr = addToString(j.id, titleStr, track)
-        print(titleStr)
-        titleStr = ''
-        # Make var true again else it wont work correctly next time function is called.
-        firstTrue = True
-    # else if no checkbox checked, do this.
-    else:
-        # Make new filename string
-        titleStr = format.get()
-        # Check if string contains any of the replace symbols ({title}, {tracknumber}...etc)
-        if '{tracknumber}' in format.get():
-            titleStr = titleStr.replace('{tracknumber}', track.tracknumber)
-        if '{artist}' in format.get():
-            titleStr = titleStr.replace('{artist}', track.artist)
-        if '{album}' in format.get():
-            titleStr = titleStr.replace('{album}', track.album)
-        if '{title}' in format.get():
-            titleStr = titleStr.replace('{title}', track.title)
-        print(titleStr)
-
-
-# Add checked checkbox value to string.
-def addToString(id, str, trk):
-    # if which ever value id matches to.
-    if id == 'chkTracknumber':
-        str = trk.tracknumber
-    if id == 'chkArtist':
-        str += trk.artist
-    if id == 'chkAlbum':
-        str += trk.album
-    if id == 'chkTitle':
-        str += trk.title
-    return str
 
 
 def getFolderPath():
@@ -175,7 +131,7 @@ def addFiles():
     endTime = time.perf_counter()
     # Update status text
     # ADD STATISTICS HERE LATER (RUNTIME, FOLDERS, ADDED FILES, SKIPPED FILES)
-    statusText.set(f'Folders: {folders}   Files: {files}   Added: {added}   Skipped: {skipped}   Errors: {errors}   Time: {endTime - startTime:0.2f}s')
+    statusText.set(f'Folders: {folders}  Files: {files}  Added: {added}  Skipped: {skipped}  Errors: {errors}  Time: {endTime - startTime:0.2f}s')
 
 
 # Insert text into program window.
