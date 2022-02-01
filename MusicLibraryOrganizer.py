@@ -8,10 +8,9 @@ from tkinter import ttk
 from tkinter import filedialog
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3 as MP3
+import threading
 
 # Global variables
-# Make separator user changeable
-separator = ' - '
 supportedFiletypes = [".flac", ".mp3"]
 trackList = []
 checkBoxStates = []
@@ -44,9 +43,9 @@ def placeholder():
         # print(track.artist[0])
         # print(track.title[0])
         # print(track.album[0])
-        createFilename(track, separator)
+        createFilename(track, userSeparator.get(), entryFormat)
 
-    print(entryFormat.get())
+    # print(entryFormat.get())
 
 
 # do all title formatting here.
@@ -55,7 +54,7 @@ def formatTitle():
 
 
 # Create the filename
-def createFilename(track, sepa):
+def createFilename(track, sepa, format):
     # Create string based on checkbox value or entry string.
     # Check which method to use.
     # if any checkbox checked, do this.
@@ -82,8 +81,18 @@ def createFilename(track, sepa):
         firstTrue = True
     # else if no checkbox checked, do this.
     else:
-        print('No checkboxes checked.')
-        print('Functionality not implemented.')
+        # Make new filename string
+        titleStr = format.get()
+        # Check if string contains any of the replace symbols ({title}, {tracknumber}...etc)
+        if '{tracknumber}' in format.get():
+            titleStr = titleStr.replace('{tracknumber}', track.tracknumber)
+        if '{artist}' in format.get():
+            titleStr = titleStr.replace('{artist}', track.artist)
+        if '{album}' in format.get():
+            titleStr = titleStr.replace('{album}', track.album)
+        if '{title}' in format.get():
+            titleStr = titleStr.replace('{title}', track.title)
+        print(titleStr)
 
 
 # Add checked checkbox value to string.
@@ -105,7 +114,8 @@ def getFolderPath():
     folderPath.set(folder_selected)
 
 
-def runProgram():
+# ADD TRY CATCH TO APPEND, IT SOMETIMES FAILES AND THROWS ERROR!
+def addFiles():
     # Get current directory
     current_dir = pathlib.Path(folderPath.get())
     # Run the program. Create Track obj for every .flac/.mp3 file.
@@ -118,13 +128,30 @@ def runProgram():
             # get files metadata
             metadata = FLAC(path)
             # Append objects with metadata to tracklist. metadata['xx'] probably wrong. Make it only string.
-            trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
+            try:
+                trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
+                programOutput(str(path) + '   --> Added')
+            except KeyError:
+                programOutput(str(path) + '   --> ERROR: Failed to Add. Missing metadata?')
         # If ext is .mp3
         elif ext == supportedFiletypes[1]:
             # same as flac section, check comments there.
             metadata = MP3(path)
-            trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
-        print('Item of class track created and added to list.')
+            try:
+                trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
+                programOutput(str(path) + '   --> Added')
+            except KeyError:
+                programOutput(str(path) + '   --> ERROR: Failed to Add. Missing metadata?')
+        else:
+            programOutput(str(path) + '   --> Skipped')
+
+
+# Insert text into program window.
+def programOutput(text):
+    textbox.configure(state="normal")
+    textbox.insert(tk.END, " " + text + "\n")
+    textbox.yview(tk.END)
+    textbox.configure(state="disabled")
 
 
 # Toggle run button state. Check if folderpath is valid folder path.
@@ -171,7 +198,7 @@ def dynamicFormatString(sepa):
         entryFormat.set(dynVarStr)
     # If no checkboxes checked, placeholdertext defaults to empty. Might Change to something else later.
     else:
-        entryFormat.set('')
+        entryFormat.set('{tracknumber}' + sepa + '{artist}' + sepa + '{album}' + sepa + '{title}')
 
 
 def addToDynVar(id, str):
@@ -187,10 +214,15 @@ def addToDynVar(id, str):
     return str
 
 
+def updateSeparator(*_):
+    # run state
+    dynamicFormatString(userSeparator.get())
+
+
 # Create & Configure root
 root = tk.Tk()
 # root.geometry("650x400")
-root.geometry('830x520')
+root.geometry('1280x720')
 # Window title and icon
 root.title("Music Library Organizer")
 root.iconbitmap(default="mlo_icon.ico")
@@ -201,7 +233,10 @@ sideFrame.pack(side=tk.LEFT, fill=tk.BOTH)
 
 topFrame = tk.Frame(root)
 topFrame.pack(side=tk.TOP, fill=tk.X, padx=(4, 2), pady=(2, 2))
-#
+
+middleFrame = tk.Frame(root)
+middleFrame.pack(side=tk.TOP, fill=tk.X, padx=(4, 4), pady=(0, 2))
+
 bottomFrame = tk.Frame(root)
 bottomFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES, padx=(4, 4), pady=(0, 4))
 
@@ -226,16 +261,16 @@ checkBoxStates.append(chk('chkTitle', chkVarTit))
 incLabel = tk.Label(sideFrame, text="Include", font="Arial 10 bold")
 incLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
+checkBox1 = tk.Checkbutton(sideFrame, text="Tracknumber", variable=chkVarNum, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
 checkBox1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
+checkBox2 = tk.Checkbutton(sideFrame, text="Artist", variable=chkVarArt, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
 checkBox2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=chkVarAlb, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
+checkBox3 = tk.Checkbutton(sideFrame, text="Album", variable=chkVarAlb, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
 checkBox3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=chkVarTit, command=lambda: [toggleFormat(), dynamicFormatString(separator)])
+checkBox4 = tk.Checkbutton(sideFrame, text="Title", variable=chkVarTit, command=lambda: [toggleFormat(), dynamicFormatString(userSeparator.get())])
 checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Language checkboxes
@@ -255,17 +290,26 @@ checkBox5 = tk.Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
 checkBox5.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Click and run program.
-btnRun = ttk.Button(topFrame, text="Run", command=runProgram, state="disabled")
+btnRun = ttk.Button(topFrame, text="Add", command=threading.Thread(target=addFiles).start, state="disabled")
 btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
 # Temporary buttons for testing
-btnTest = ttk.Button(topFrame, text="Test", command=placeholder)
+btnTest = ttk.Button(topFrame, text="Rename", command=placeholder)
 btnTest.pack(side=tk.LEFT, padx=(2, 1))
 
 # Free naming format
 entryFormat = tk.StringVar(root, value='{tracknumber} - {artist} - {album} - {title}')
-renameFormat = tk.Entry(bottomFrame, textvariable=entryFormat)
-renameFormat.pack(side=tk.TOP, fill=tk.X, expand=tk.NO, padx=(0, 0), pady=(0, 2))
+renameFormat = tk.Entry(middleFrame, textvariable=entryFormat)
+renameFormat.pack(side=tk.RIGHT, fill=tk.X, expand=tk.YES, padx=(0, 0), pady=(0, 2))
+
+# Separator entry
+userSeparator = tk.StringVar(root, value=' - ')
+separatorEntry = tk.Entry(middleFrame, textvariable=userSeparator, width=3, justify=tk.CENTER)
+separatorEntry.pack(side=tk.LEFT, expand=tk.NO, padx=(0, 5), pady=(0, 2))
+
+
+# Update renameFormat when separator is changed.
+userSeparator.trace_add("write", updateSeparator)
 
 # check if anything written in entry box.
 folderPath.trace_add("write", toggleState)
