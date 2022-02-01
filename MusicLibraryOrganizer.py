@@ -53,17 +53,12 @@ class Track:
         return newFilename
 
 
-# Test function
+# Renaming
 def renameFiles():
     # Iterate through all the tracks (objects)
     for track in trackList:
-        filename = track.createNewFilename(userSeparator.get(), entryFormat.get(), checkBoxStates)
+        filename = track.createNewFilename(userSeparator.get(), entryFormat.get())
         print(filename)
-
-
-# do all title formatting here.
-def formatTitle():
-    print('Hello World!')
 
 
 def getFolderPath():
@@ -132,6 +127,9 @@ def addFiles():
     # Update status text
     # ADD STATISTICS HERE LATER (RUNTIME, FOLDERS, ADDED FILES, SKIPPED FILES)
     statusText.set(f'Folders: {folders}  Files: {files}  Added: {added}  Skipped: {skipped}  Errors: {errors}  Time: {endTime - startTime:0.2f}s')
+    # Check if tracklist has items
+    if not len(trackList) == 0:
+        btnRename.configure(state="normal")
 
 
 # Insert text into program window.
@@ -166,22 +164,22 @@ def dynamicFormatString(sepa):
     # Var for checking if its loops first iteration.
     # Check so it doesnt throw variable reference error!
     if any(i.value.get() is True for i in checkBoxStates):
-        firstTrue = True
+        firstIteration = True
         for i in checkBoxStates:
             if i.value.get() is True:
                 # Only do this on first iteration.
-                if firstTrue is True:
+                if firstIteration is True:
                     # call addToDynVar to add value of checked checkbox.
                     dynVarStr = addToDynVar(i.id, '')
                     # Var false, we dont want this to run multiple times.
-                    firstTrue = False
+                    firstIteration = False
                 # do this on the other iterations.
                 else:
                     dynVarStr += sepa
                     dynVarStr = addToDynVar(i.id, dynVarStr)
         # dynVarStr = ''
         # Make var true again else it wont work correctly next time function is called.
-        firstTrue = True
+        firstIteration = True
         # Set entry box text.
         entryFormat.set(dynVarStr)
     # If no checkboxes checked, placeholdertext defaults to empty. Might Change to something else later.
@@ -287,8 +285,8 @@ btnRun = ttk.Button(topFrame, text="Add", command=lambda: threading.Thread(targe
 btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
 # Rename added files.
-btnTest = ttk.Button(topFrame, text="Rename", command=renameFiles)
-btnTest.pack(side=tk.LEFT, padx=(2, 1))
+btnRename = ttk.Button(topFrame, text="Rename", command=renameFiles, state="disabled")
+btnRename.pack(side=tk.LEFT, padx=(2, 1))
 
 # Free naming format
 entryFormat = tk.StringVar(root, value='{tracknumber} - {artist} - {album} - {title}')
