@@ -36,7 +36,7 @@ class Track:
 
 
 # Test function
-def placeholder():
+def renameFiles():
     # Iterate through all the tracks (objects)
     for track in trackList:
         # 0 to only get content.
@@ -326,12 +326,12 @@ checkVar5 = tk.IntVar()
 checkBox5 = tk.Checkbutton(sideFrame, text="Fix Title", variable=checkVar5)
 checkBox5.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-# Click and run program.
+# Scan folders and add files.
 btnRun = ttk.Button(topFrame, text="Add", command=lambda: threading.Thread(target=addFiles).start(), state="disabled")
 btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
-# Temporary buttons for testing
-btnTest = ttk.Button(topFrame, text="Rename", command=placeholder)
+# Rename added files.
+btnTest = ttk.Button(topFrame, text="Rename", command=renameFiles)
 btnTest.pack(side=tk.LEFT, padx=(2, 1))
 
 # Free naming format
