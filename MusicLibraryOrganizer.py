@@ -377,11 +377,11 @@ checkBoxLANG4 = tk.Checkbutton(sideFrame, text="Romanji", font=fontNormal, varia
 checkBoxLANG4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Extra function checkboxes
-extraLabel = ttk.Label(sideFrame, text="Extra", font=fontBold)
+extraLabel = ttk.Label(sideFrame, text="Metadata", font=fontBold)
 extraLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 checkVar5 = tk.IntVar()
-checkBox5 = tk.Checkbutton(sideFrame, text="Fix Title", font=fontNormal, variable=checkVar5)
+checkBox5 = tk.Checkbutton(sideFrame, text="Title", font=fontNormal, variable=checkVar5, state='disabled')
 checkBox5.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Scan folders and add files.
@@ -436,7 +436,11 @@ menubar.add_cascade(label="Music Library Organizer", menu=mlo)
 
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label='About', command=lambda: programOutput('\n  Music Library Organizer \n  Author: ' + author + ' \n  Version: ' + version + ' \n'))
-helpmenu.add_command(label='Help', command=lambda: programOutput('\n  How to use program... \n'))
+helpmenu.add_command(label='Help', command=lambda: programOutput('\n  Checkboxes under Include are used to determine which fields to include in the filename. \n\n' +
+                                                                 '  If no checkboxes are ticked a custom format can be specified in the right textbox. The following tags are available: \n\n' +
+                                                                 '  {tracknumber}, {artist}, {album} and {title} \n\n' +
+                                                                 '  A separator can be specified in the left textbox. The separator will be added between all tags. \n\n' +
+                                                                 '  Langauge and Metadata functions currently not available.'))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 # Menu
