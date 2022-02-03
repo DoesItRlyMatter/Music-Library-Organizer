@@ -130,8 +130,14 @@ def renameFiles():
         track.removeIllegal()
         # Create the filename
         filename = track.createNewFilename(userSeparator.get(), entryFormat.get())
-        print(filename)
+        # Add ext to filename
+        filename = filename + track.ext
+        programOutput(filename, 'added')
+        # Rename // This rename line is confusing.
+        track.path.rename(pathlib.Path(track.path.parent, filename))
         # MIGHT COUNT WRONG IF HERE? WHAT IF RENAME FAILS.
+        # Replace old path with new path.
+        track.path = pathlib.Path(track.path.parent, filename)
         filesRenamed += 1
     # Check state of clear checkbox
     if checkVarClear.get() == 1:
