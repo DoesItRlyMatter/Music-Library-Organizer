@@ -6,12 +6,17 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter import Menu
 import tkinter.font as tkf
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3 as MP3
 import threading
 import time
 import string
+
+# INFO
+author = 'DIRM'
+version = '0.9'
 
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
@@ -68,11 +73,14 @@ class Track:
         return newFilename
 
     def formatTracknumber(self):
+        # IF TRACKNUMBERING SCUFFS, THIS IS PROBLEM! MAKE LOOP // WHILE LEN(tracknumber) > 2 && Loops < 4 { LSTRIP('0') }
+        loops = 0
+        while (len(self.tracknumber) > 2 and loops < 4):
+            self.tracknumber = self.tracknumber.lstrip('0')
+            loops += 1
+        # if len(self.tracknumber) > 2:
         if len(self.tracknumber) < 2:
             self.tracknumber = '0' + self.tracknumber
-        # IF TRACKNUMBERING SCUFFS, THIS IS PROBLEM! MAKE LOOP
-        if len(self.tracknumber) > 2:
-            self.tracknumber = self.tracknumber.lstrip('0')
 
     def formatRestMeta(self, format):
         if '{artist}' in format:
@@ -105,6 +113,12 @@ class Track:
 
 # Renaming
 def renameFiles():
+    # Start time
+    startTime = time.perf_counter()
+    # Update statusbar
+    statusText.set(' Renaming files...')
+    # Rename counter
+    filesRenamed = 0
     # Iterate through all the tracks (objects)
     for track in trackList:
         # formatMetadata(track, entryFormat.get())
@@ -117,6 +131,16 @@ def renameFiles():
         # Create the filename
         filename = track.createNewFilename(userSeparator.get(), entryFormat.get())
         print(filename)
+        # MIGHT COUNT WRONG IF HERE? WHAT IF RENAME FAILS.
+        filesRenamed += 1
+    # Check state of clear checkbox
+    if checkVarClear.get() == 1:
+        # clear all items from tracklist
+        clearTracklist()
+    # End time.
+    endTime = time.perf_counter()
+    # Update statusbar
+    statusText.set(f' {filesRenamed} files renamed in {endTime - startTime:0.2f}s')
 
 
 def getFolderPath():
@@ -263,12 +287,18 @@ def updateSeparator(*_):
     dynamicFormatString(userSeparator.get())
 
 
+# Clear tracklist and disable rename button
+def clearTracklist():
+    trackList.clear()
+    btnRename.configure(state="disabled")
+
+
 # Create & Configure root
 root = tk.Tk()
 # root.geometry("650x400")
 root.geometry('1280x720')
 # Window title and icon
-root.title("Music Library Organizer")
+root.title('Music Library Organizer v.' + version)
 root.iconbitmap(default="mlo_icon.ico")
 
 # Fonts
@@ -333,9 +363,18 @@ checkBox4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 langLabel = ttk.Label(sideFrame, text="Language", font=fontBold)
 langLabel.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
-checkVarLANG = tk.IntVar()
-checkBoxLANG = tk.Checkbutton(sideFrame, text="Romanji", font=fontNormal, variable=checkVarLANG, state=tk.DISABLED)
-checkBoxLANG.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
+checkVarLANG1 = tk.IntVar()
+checkBoxLANG1 = tk.Checkbutton(sideFrame, text="English", font=fontNormal, variable=checkVarLANG1, state=tk.DISABLED)
+checkBoxLANG1.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
+checkVarLANG2 = tk.IntVar()
+checkBoxLANG2 = tk.Checkbutton(sideFrame, text="Swedish", font=fontNormal, variable=checkVarLANG2, state=tk.DISABLED)
+checkBoxLANG2.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
+checkVarLANG3 = tk.IntVar()
+checkBoxLANG3 = tk.Checkbutton(sideFrame, text="Finnish", font=fontNormal, variable=checkVarLANG3, state=tk.DISABLED)
+checkBoxLANG3.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
+checkVarLANG4 = tk.IntVar()
+checkBoxLANG4 = tk.Checkbutton(sideFrame, text="Romanji", font=fontNormal, variable=checkVarLANG4, state=tk.DISABLED)
+checkBoxLANG4.pack(anchor=tk.W, side=tk.TOP, padx=(0, 0))
 
 # Extra function checkboxes
 extraLabel = ttk.Label(sideFrame, text="Extra", font=fontBold)
@@ -350,8 +389,13 @@ btnRun = ttk.Button(topFrame, text="Add", command=lambda: threading.Thread(targe
 btnRun.pack(side=tk.LEFT, padx=(2, 1))
 
 # Rename added files.
-btnRename = ttk.Button(topFrame, text="Rename", command=renameFiles, state="disabled")
+btnRename = ttk.Button(topFrame, text="Rename", command=lambda: threading.Thread(target=renameFiles).start(), state="disabled")
 btnRename.pack(side=tk.LEFT, padx=(2, 1))
+
+# Clear checkbox
+checkVarClear = tk.IntVar()
+checkBoxClear = tk.Checkbutton(middleFrame, text="Clear list", font=fontNormal, variable=checkVarClear, state=tk.NORMAL)
+checkBoxClear.pack(side=tk.RIGHT, padx=(0, 0))
 
 # Free naming format
 entryFormat = tk.StringVar(root, value='{tracknumber} - {artist} - {album} - {title}')
@@ -362,7 +406,6 @@ renameFormat.pack(side=tk.RIGHT, fill=tk.X, expand=tk.YES, padx=(0, 0), pady=(0,
 userSeparator = tk.StringVar(root, value=' - ')
 separatorEntry = tk.Entry(middleFrame, textvariable=userSeparator, font=fontNormal, width=3, justify=tk.CENTER)
 separatorEntry.pack(side=tk.LEFT, expand=tk.NO, padx=(0, 5), pady=(0, 2))
-
 
 # Update renameFormat when separator is changed.
 userSeparator.trace_add("write", updateSeparator)
@@ -380,5 +423,23 @@ textbox.tag_configure('error', foreground='red', font=fontNormal)
 textbox.tag_configure('skipped', foreground='grey', font=fontNormal)
 textbox.tag_configure('added', foreground='green', font=fontNormal)
 
+# Create menu bar
+menubar = Menu(root)
+mlo = Menu(menubar, tearoff=0)
+mlo.add_command(label='Browse', command=getFolderPath)
+mlo.add_command(label='Add', command=lambda: threading.Thread(target=addFiles).start())
+mlo.add_command(label='Rename', command=lambda: threading.Thread(target=renameFiles).start())
+mlo.add_command(label='Clear Tracklist', command=lambda: clearTracklist())
+mlo.add_separator()
+mlo.add_command(label='Quit', command=root.quit)
+menubar.add_cascade(label="Music Library Organizer", menu=mlo)
+
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label='About', command=lambda: programOutput('\n  Music Library Organizer \n  Author: ' + author + ' \n  Version: ' + version + ' \n'))
+helpmenu.add_command(label='Help', command=lambda: programOutput('\n  How to use program... \n'))
+menubar.add_cascade(label="Help", menu=helpmenu)
+
+# Menu
+root.config(menu=menubar)
 # Mainloop
 root.mainloop()
