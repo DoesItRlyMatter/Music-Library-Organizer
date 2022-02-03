@@ -58,8 +58,8 @@ class Track:
         table = self.title.maketrans('', '', remove)
         self.title = self.title.translate(table)
 
-    # Return new filename based on metadata. RETURNS FILENAME AS STRING
-    def createNewFilename(self, separator, format):
+    # Replaces tags with metadata, returns filename string
+    def createNewFilename(self, format):
         newFilename = format
         # Check if custom user format contains the replaceable strings
         if '{tracknumber}' in format:
@@ -72,26 +72,31 @@ class Track:
             newFilename = newFilename.replace('{title}', self.title)
         return newFilename
 
+    # Make tracknumber 2 digits, remove starting zeros. Not foolproof.
     def formatTracknumber(self):
-        # IF TRACKNUMBERING SCUFFS, THIS IS PROBLEM! MAKE LOOP // WHILE LEN(tracknumber) > 2 && Loops < 4 { LSTRIP('0') }
         loops = 0
+        # Remove zeros if more than 2 digits, try 4 times.
         while (len(self.tracknumber) > 2 and loops < 4):
             self.tracknumber = self.tracknumber.lstrip('0')
             loops += 1
-        # if len(self.tracknumber) > 2:
+        # If less than 2 digits, add zero at start.
         if len(self.tracknumber) < 2:
             self.tracknumber = '0' + self.tracknumber
 
+    # Format rest of metadata. All words start with caps etc.
     def formatRestMeta(self, format):
         if '{artist}' in format:
             self.artist = string.capwords(self.artist)
         if '{album}' in format:
             self.album = string.capwords(self.album)
+            # Check if string contains [, capitalize the next letter.
+            # Scuffs if there is multiple [... should check if theres multiple.
             try:
                 index = self.album.index('[')
                 self.album = self.album[:index+1] + self.album[index+1].upper() + self.album[index+2:]
             except ValueError:
                 pass
+            # Check if string contains (, capitalize the next letter.
             try:
                 index = self.album.index('(')
                 self.album = self.album[:index+1] + self.album[index+1].upper() + self.album[index+2:]
@@ -99,11 +104,13 @@ class Track:
                 pass
         if '{title}' in format:
             self.title = string.capwords(self.title)
+            # Same as above
             try:
                 index = self.title.index('[')
                 self.title = self.title[:index+1] + self.title[index+1].upper() + self.title[index+2:]
             except ValueError:
                 pass
+            # Same as above
             try:
                 index = self.title.index('(')
                 self.title = self.title[:index+1] + self.title[index+1].upper() + self.title[index+2:]
@@ -121,7 +128,6 @@ def renameFiles():
     filesRenamed = 0
     # Iterate through all the tracks (objects)
     for track in trackList:
-        # formatMetadata(track, entryFormat.get())
         # Format tracknumbers
         track.formatTracknumber()
         # Format rest of metadata
@@ -129,13 +135,13 @@ def renameFiles():
         # Remove illegal symbols from tracknumber, artist, album and title
         track.removeIllegal()
         # Create the filename
-        filename = track.createNewFilename(userSeparator.get(), entryFormat.get())
+        filename = track.createNewFilename(entryFormat.get())
         # Add ext to filename
         filename = filename + track.ext
+        # Output
         programOutput(filename, 'added')
         # Rename // This rename line is confusing.
         track.path.rename(pathlib.Path(track.path.parent, filename))
-        # MIGHT COUNT WRONG IF HERE? WHAT IF RENAME FAILS.
         # Replace old path with new path.
         track.path = pathlib.Path(track.path.parent, filename)
         filesRenamed += 1
@@ -154,49 +160,42 @@ def getFolderPath():
     folderPath.set(folder_selected)
 
 
-# ADD TRY CATCH TO APPEND, IT SOMETIMES FAILES AND THROWS ERROR!
+# Add
 def addFiles():
     # Counters
     folders, files, added, skipped, errors = 0, 0, 0, 0, 0
     # Start time.
     startTime = time.perf_counter()
-    # Set status text
+    # Update statusbar
     statusText.set(' Adding files...')
     # Get current directory
     current_dir = pathlib.Path(folderPath.get())
     # Run the program. Create Track obj for every .flac/.mp3 file.
     for path in sorted(current_dir.rglob("*")):
-        # Add to file counter.
         files += 1
-        # print(pathlib.Path(path).suffix)
         ext = pathlib.Path(path).suffix
         # Check if ext is .flac [0] or .mp3 [1]
-        # If ext is .flac
         if ext == supportedFiletypes[0]:
             # get files metadata
             metadata = FLAC(path)
-            # Append objects with metadata to tracklist. metadata['xx'] probably wrong. Make it only string.
+            # Append objects with metadata to tracklist. metadata['xx']
             try:
                 trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
-                # add to added counter.
                 added += 1
+                # Output GREEN
                 programOutput('  ' + str(path), 'added')
             except KeyError:
-                # add to error and skipped counters
                 errors += 1
                 skipped += 1
+                # Output RED
                 programOutput('  ' + str(path) + ' - Error: Failed to Add. Missing metadata?', 'error')
-        # If ext is .mp3
         elif ext == supportedFiletypes[1]:
-            # same as flac section, check comments there.
             metadata = MP3(path)
             try:
                 trackList.append(Track(path, ext, metadata['title'][0], metadata['tracknumber'][0], metadata['artist'][0], metadata['album'][0]))
-                # add to added counter.
                 added += 1
                 programOutput('  ' + str(path), 'added')
             except KeyError:
-                # add to error and skipped counters.
                 errors += 1
                 skipped += 1
                 programOutput('  ' + str(path) + ' - Error: Failed to Add. Missing metadata?', 'error')
@@ -206,16 +205,17 @@ def addFiles():
                 # add to folder counter, remove one from file counter.
                 folders += 1
                 files -= 1
+                # Output BLACK
                 programOutput(str(path), 'folder')
             else:
                 skipped += 1
+                # Output GREY
                 programOutput('  ' + str(path), 'skipped')
     # End time.
     endTime = time.perf_counter()
-    # Update status text
-    # ADD STATISTICS HERE LATER (RUNTIME, FOLDERS, ADDED FILES, SKIPPED FILES)
+    # Update statusbar
     statusText.set(f' Folders: {folders}  Files: {files}  Added: {added}  Skipped: {skipped}  Errors: {errors}  Time: {endTime - startTime:0.2f}s')
-    # Check if tracklist has items
+    # Normalize rename button if tracklist contains items.
     if not len(trackList) == 0:
         btnRename.configure(state="normal")
 
@@ -228,9 +228,9 @@ def programOutput(text, tags=None):
     textbox.configure(state="disabled")
 
 
-# Toggle run button state. Check if folderpath is valid folder path.
+# Toggle Add button state. Check if folderpath is valid folder path.
 def toggleState(*_):
-    # run state
+    # Add state
     if os.path.isdir(folderPath.get()):
         btnRun.config(state="normal")
     else:
@@ -245,12 +245,8 @@ def toggleFormat():
         renameFormat.config(state="normal")
 
 
-# Testing changing placeholder text.
-# Write logic for this!
 def dynamicFormatString(sepa):
-    # iterate through checkboxes, add whats checked.
-    # Var for checking if its loops first iteration.
-    # Check so it doesnt throw variable reference error!
+    # Check if any checkbox is ticked.
     if any(i.value.get() is True for i in checkBoxStates):
         firstIteration = True
         for i in checkBoxStates:
@@ -259,18 +255,16 @@ def dynamicFormatString(sepa):
                 if firstIteration is True:
                     # call addToDynVar to add value of checked checkbox.
                     dynVarStr = addToDynVar(i.id, '')
-                    # Var false, we dont want this to run multiple times.
                     firstIteration = False
-                # do this on the other iterations.
+                # Every other iteration
                 else:
                     dynVarStr += sepa
                     dynVarStr = addToDynVar(i.id, dynVarStr)
-        # dynVarStr = ''
         # Make var true again else it wont work correctly next time function is called.
         firstIteration = True
         # Set entry box text.
         entryFormat.set(dynVarStr)
-    # If no checkboxes checked, placeholdertext defaults to empty. Might Change to something else later.
+    # Default text if no ticked checkbox
     else:
         entryFormat.set('{tracknumber}' + sepa + '{artist}' + sepa + '{album}' + sepa + '{title}')
 
@@ -289,7 +283,6 @@ def addToDynVar(id, str):
 
 
 def updateSeparator(*_):
-    # run state
     dynamicFormatString(userSeparator.get())
 
 
