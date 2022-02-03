@@ -16,7 +16,7 @@ import string
 
 # INFO
 author = 'DIRM'
-version = '0.9'
+version = '0.91'
 
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
