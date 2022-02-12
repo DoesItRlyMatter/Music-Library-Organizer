@@ -16,7 +16,7 @@ import string
 
 # INFO
 author = 'DIRM'
-version = '0.91'
+version = '0.92'
 
 # Global variables
 supportedFiletypes = [".flac", ".mp3"]
@@ -296,6 +296,7 @@ def clearTracklist():
 root = tk.Tk()
 # root.geometry("650x400")
 root.geometry('1280x720')
+root.minsize(400, 600)
 # Window title and icon
 root.title('Music Library Organizer v.' + version)
 root.iconbitmap(default="mlo_icon.ico")
